@@ -1,0 +1,22 @@
+{
+  "name": "adforge-api",
+  "version": "1.0.0",
+  "description": "AdForge backend proxy — Vercel Edge Functions for Fal.ai AI generation",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fal-ai/client": "^1.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0",
+    "vercel": "^39.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

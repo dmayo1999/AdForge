@@ -1,0 +1,60 @@
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+DerivedData/
+build/
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+*.xcscmblueprint
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+Packages/
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# macOS
+.DS_Store
+*.swp
+*~
+.AppleDouble
+.LSOverride
+
+# Firebase
+GoogleService-Info.plist
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node (backend)
+backend/node_modules/
+backend/.vercel/
+backend/.env
+
+# IDE
+.idea/
+.vscode/
+*.code-workspace
+
+# Archives
+*.xcarchive
+
+# Provisioning
+*.mobileprovision
+*.provisionprofile

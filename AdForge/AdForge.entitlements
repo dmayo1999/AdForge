@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Sign in with Apple -->
+    <key>com.apple.developer.applesignin</key>
+    <array>
+        <string>Default</string>
+    </array>
+
+    <!-- Network access for API calls -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+
+    <!-- Associated Domains for Universal Links (deep links) -->
+    <key>com.apple.developer.associated-domains</key>
+    <array>
+        <string>applinks:adforge.app</string>
+        <string>applinks:adforge-api.vercel.app</string>
+    </array>
+
+    <!-- Push Notifications -->
+    <key>aps-environment</key>
+    <string>development</string>
+</dict>
+</plist>

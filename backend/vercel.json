@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "name": "adforge-api",
+  "framework": null,
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "edge"
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-Id",
+        "Access-Control-Max-Age": "86400"
+      },
+      "continue": true
+    },
+    {
+      "src": "/api/(.*)",
+      "methods": ["OPTIONS"],
+      "dest": "/api/health"
+    },
+    {
+      "src": "/api/check-prompt",
+      "methods": ["POST"],
+      "dest": "/api/check-prompt"
+    },
+    {
+      "src": "/api/generate-image",
+      "methods": ["POST"],
+      "dest": "/api/generate-image"
+    },
+    {
+      "src": "/api/generate-video",
+      "methods": ["POST"],
+      "dest": "/api/generate-video"
+    },
+    {
+      "src": "/api/health",
+      "methods": ["GET"],
+      "dest": "/api/health"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, X-User-Id"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ]
+}
