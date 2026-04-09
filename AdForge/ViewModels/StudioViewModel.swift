@@ -88,16 +88,22 @@ final class StudioViewModel {
                 ? "Generating image \(selectedModel.estimatedTime)..."
                 : "Generating video \(selectedModel.estimatedTime)..."
 
+            let displayName = appState.currentUser?.displayName ?? "Creator"
+            let userId = appState.currentUser?.id ?? "local"
             let generation: Generation
             if selectedType == .image {
                 generation = try await appState.generationService.generateImage(
                     prompt: trimmedPrompt,
-                    model: selectedModel
+                    model: selectedModel,
+                    userId: userId,
+                    userDisplayName: displayName
                 )
             } else {
                 generation = try await appState.generationService.generateVideo(
                     prompt: trimmedPrompt,
-                    model: selectedModel
+                    model: selectedModel,
+                    userId: userId,
+                    userDisplayName: displayName
                 )
             }
 

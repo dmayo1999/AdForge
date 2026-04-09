@@ -31,8 +31,11 @@ struct CompetitionsView: View {
                         VStack(alignment: .leading, spacing: Design.paddingLG) {
                             // Daily challenge spotlight
                             if let daily = viewModel.dailyChallengesSub {
-                                DailyChallengeCard(sub: daily)
-                                    .padding(.horizontal, Design.paddingMD)
+                                NavigationLink(value: daily) {
+                                    DailyChallengeCard(sub: daily)
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.horizontal, Design.paddingMD)
                             }
 
                             // All subs grid
@@ -262,7 +265,7 @@ struct TimeBadge: View {
         HStack(spacing: 3) {
             Image(systemName: "clock.fill")
                 .font(.system(size: 9))
-            Text("\(hours)h")
+            Text("Ends in \(hours)h")
                 .font(Design.badgeFont)
         }
         .foregroundStyle(Design.warning)

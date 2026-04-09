@@ -190,6 +190,7 @@ export default async function handler(req: Request): Promise<Response> {
     return json(
       {
         imageURL: result.imageURL,
+        thumbnailURL: result.imageURL,
         model: model.trim(),
         prompt: cleanPrompt,
       },
@@ -212,7 +213,8 @@ export default async function handler(req: Request): Promise<Response> {
       return json({ error: "invalid_request", message }, 400);
     }
 
-    return json({ error: "generation_failed", message }, 500);
+    console.error("[generate-image] raw error:", message);
+    return json({ error: "generation_failed", message: "Generation failed. Please try again." }, 500);
   }
 }
 

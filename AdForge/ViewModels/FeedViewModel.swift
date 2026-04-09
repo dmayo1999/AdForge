@@ -77,6 +77,8 @@ final class FeedViewModel {
             if let idx = generations.firstIndex(where: { $0.id == generation.id }) {
                 generations[idx].voteCount += 1
             }
+            // Decrement hearts
+            appState.currentUser?.heartsRemaining -= 1
         } catch {
             appState.errorMessage = error.localizedDescription
         }

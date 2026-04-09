@@ -26,6 +26,7 @@ struct AdForgeApp: App {
 
 struct MainTabView: View {
     @Bindable var appState: AppState
+    @State private var showDailyCreditsToast = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -35,8 +36,52 @@ struct MainTabView: View {
 
             // Custom tab bar
             CustomTabBar(selectedTab: $appState.selectedTab)
+
+            // Daily credits toast
+            if showDailyCreditsToast {
+                DailyCreditsToast()
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .zIndex(100)
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .padding(.top, 60)
+            }
         }
         .background(Design.background.ignoresSafeArea())
+        .task {
+            let collected = await appState.collectDailyCredits()
+            if collected {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                    showDailyCreditsToast = true
+                }
+                try? await Task.sleep(for: .seconds(3))
+                withAnimation(.easeOut(duration: 0.3)) {
+                    showDailyCreditsToast = false
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Daily Credits Toast
+
+private struct DailyCreditsToast: View {
+    var body: some View {
+        HStack(spacing: Design.paddingSM) {
+            Image(systemName: "dollarsign.circle.fill")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(Design.credit)
+            Text("+500 daily credits")
+                .font(.system(size: 15, weight: .bold, design: .rounded))
+                .foregroundStyle(Design.textPrimary)
+        }
+        .padding(.horizontal, Design.paddingMD)
+        .padding(.vertical, Design.paddingSM)
+        .background(
+            Capsule()
+                .fill(Design.surface)
+                .shadow(color: Design.credit.opacity(0.3), radius: 12, x: 0, y: 4)
+                .overlay(Capsule().stroke(Design.credit.opacity(0.4), lineWidth: 1))
+        )
     }
 }
 

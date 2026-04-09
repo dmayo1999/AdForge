@@ -30,13 +30,13 @@ extension Badge {
             id: "badge-meme-lord",
             name: "Meme Lord",
             iconName: "crown.fill",
-            description: "Win the Best Meme sub at least once."
+            description: "Submit 50 entries to the Best Meme sub."
         ),
         Badge(
             id: "badge-video-virtuoso",
             name: "Video Virtuoso",
             iconName: "film.fill",
-            description: "Generate 10 or more videos."
+            description: "Generate 25 or more videos."
         ),
         Badge(
             id: "badge-streak-master",

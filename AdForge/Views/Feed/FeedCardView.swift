@@ -91,7 +91,7 @@ private struct CreatorHeaderView: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("Creator") // Would use displayName from joined user data
+                Text(generation.userDisplayName)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Design.textPrimary)
                 Text(generation.createdAt.timeAgoDisplay)

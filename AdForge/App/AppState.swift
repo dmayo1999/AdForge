@@ -93,20 +93,22 @@ final class AppState {
     // MARK: - Daily Credits
 
     /// Collects free daily credits if not already collected today.
-    func collectDailyCredits() async {
-        guard isAuthenticated, var user = currentUser else { return }
-        guard !user.dailyFreeCreditsCollected else { return }
+    /// CreditService is the single source of truth for whether daily credits were collected.
+    func collectDailyCredits() async -> Bool {
+        guard isAuthenticated else { return false }
 
         do {
             let collected = try await creditService.collectDailyFree()
             if collected {
-                user.dailyFreeCreditsCollected = true
                 let newBalance = await creditService.fetchBalance()
-                user.credits = newBalance
-                currentUser = user
+                currentUser?.credits = newBalance
             }
+            return collected
+        } catch CreditError.dailyAlreadyCollected {
+            return false
         } catch {
             errorMessage = error.localizedDescription
+            return false
         }
     }
 

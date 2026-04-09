@@ -64,11 +64,11 @@ actor NetworkClient {
 
         self.decoder = JSONDecoder()
         self.decoder.dateDecodingStrategy = .iso8601
-        self.decoder.keyDecodingStrategy  = .convertFromSnakeCase
+        // Backend uses camelCase (imageURL, videoURL) — no snake_case conversion needed
 
         self.encoder = JSONEncoder()
         self.encoder.dateEncodingStrategy = .iso8601
-        self.encoder.keyEncodingStrategy  = .convertToSnakeCase
+        // Send camelCase to match backend expectations
     }
 
     // MARK: - GET

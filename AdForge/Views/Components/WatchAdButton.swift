@@ -8,7 +8,6 @@ struct WatchAdButton: View {
     let adsRemaining: Int
     let action: () -> Void
 
-    @State private var gradientAngle: Double = 0
     @State private var isPressed = false
 
     private var isDisabled: Bool { adsRemaining <= 0 || isLoading }

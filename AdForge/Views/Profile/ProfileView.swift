@@ -242,13 +242,9 @@ private struct StatsRow: View {
     var body: some View {
         HStack(spacing: 0) {
             StatItem(value: user.totalGenerations, label: "Creations", icon: "wand.and.stars")
-            Divider()
-                .frame(height: 40)
-                .background(Design.surfaceLight)
+            Rectangle().fill(Design.surfaceLight).frame(width: 1, height: 40)
             StatItem(value: user.totalVotesReceived, label: "Votes", icon: "heart.fill")
-            Divider()
-                .frame(height: 40)
-                .background(Design.surfaceLight)
+            Rectangle().fill(Design.surfaceLight).frame(width: 1, height: 40)
             StatItem(value: user.totalWins, label: "Wins", icon: "trophy.fill")
         }
         .padding(Design.paddingMD)

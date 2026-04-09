@@ -67,6 +67,7 @@ enum AIModel: String, Codable, CaseIterable, Identifiable, Sendable {
 struct Generation: Codable, Identifiable, Sendable {
     let id: String
     let userId: String
+    var userDisplayName: String
     let prompt: String
     let model: AIModel
     let type: GenerationType
@@ -83,6 +84,7 @@ struct Generation: Codable, Identifiable, Sendable {
     static let mockImage = Generation(
         id: "gen-mock-001",
         userId: "mock-user-001",
+        userDisplayName: "ArtBot9000",
         prompt: "A neon-lit Tokyo street at midnight, rain-soaked reflections, cyberpunk atmosphere, ultra-detailed",
         model: .fluxPro,
         type: .image,
@@ -98,6 +100,7 @@ struct Generation: Codable, Identifiable, Sendable {
     static let mockVideo = Generation(
         id: "gen-mock-002",
         userId: "mock-user-001",
+        userDisplayName: "ArtBot9000",
         prompt: "A glowing jellyfish slowly ascending through deep ocean water, bioluminescent trails, cinematic",
         model: .wan25,
         type: .video,
@@ -116,6 +119,7 @@ struct Generation: Codable, Identifiable, Sendable {
         Generation(
             id: "gen-mock-003",
             userId: "mock-user-002",
+            userDisplayName: "NeonDreamer42",
             prompt: "Oil painting portrait of an elderly samurai, weathered face, distant mountains, golden hour",
             model: .fluxDev,
             type: .image,
@@ -130,6 +134,7 @@ struct Generation: Codable, Identifiable, Sendable {
         Generation(
             id: "gen-mock-004",
             userId: "mock-user-003",
+            userDisplayName: "PixelMuse777",
             prompt: "A cat wearing a tiny suit presenting a PowerPoint called 'Why Mondays Are Bad'",
             model: .fluxDev,
             type: .image,

@@ -7,8 +7,7 @@ import AuthenticationServices
 struct AuthView: View {
     @Bindable var appState: AppState
 
-    @State private var orbScale: CGFloat = 1.0
-    @State private var orbOpacity: Double = 0.7
+    // Dead state removed — animation lives in AnimatedOrb
     @State private var logoOffset: CGFloat = 20
     @State private var logoOpacity: Double = 0
     @State private var isSigningIn: Bool = false
@@ -270,9 +269,12 @@ struct SignInWithAppleButtonView: UIViewRepresentable {
         Coordinator(onTap: onTap)
     }
 
-    class Coordinator {
+    class Coordinator: NSObject {
         let onTap: () -> Void
-        init(onTap: @escaping () -> Void) { self.onTap = onTap }
+        init(onTap: @escaping () -> Void) {
+            self.onTap = onTap
+            super.init()
+        }
         @objc func handleTap() { onTap() }
     }
 }

@@ -4,7 +4,7 @@
  * Checks a prompt against the blocklist (terms, regex patterns, celebrity names).
  */
 
-import blocklist from "./blocklist.json" assert { type: "json" };
+import blocklist from "./blocklist.json" with { type: "json" };
 
 export interface CheckResult {
   safe: boolean;

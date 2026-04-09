@@ -48,6 +48,7 @@ struct SubDetailView: View {
                         EntriesListView(
                             entries: viewModel.entries,
                             currentUser: appState.currentUser,
+                            hasVotedForEntry: { viewModel.hasVotedForEntry($0) },
                             onVote: { entry in
                                 Task { await viewModel.vote(for: entry) }
                             }
@@ -193,6 +194,7 @@ private struct DetailTabPicker: View {
 private struct EntriesListView: View {
     let entries: [CompetitionEntry]
     let currentUser: AFUser?
+    let hasVotedForEntry: (String) -> Bool
     let onVote: (CompetitionEntry) -> Void
 
     var body: some View {
@@ -214,6 +216,7 @@ private struct EntriesListView: View {
                             entry: entry,
                             rank: index + 1,
                             heartsRemaining: currentUser?.heartsRemaining ?? 0,
+                            hasVoted: hasVotedForEntry(entry.id),
                             onVote: { onVote(entry) }
                         )
                     }
@@ -231,6 +234,7 @@ private struct EntryCard: View {
     let entry: CompetitionEntry
     let rank: Int
     let heartsRemaining: Int
+    let hasVoted: Bool
     let onVote: () -> Void
 
     var body: some View {
@@ -274,7 +278,7 @@ private struct EntryCard: View {
             // Vote button
             VoteButton(
                 voteCount: entry.voteCount,
-                hasVoted: false,
+                hasVoted: hasVoted,
                 heartsRemaining: heartsRemaining,
                 action: onVote
             )

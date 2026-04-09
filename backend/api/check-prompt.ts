@@ -83,10 +83,14 @@ export default async function handler(req: Request): Promise<Response> {
 
   const result = checkPrompt(prompt);
 
+  if (!result.safe) {
+    console.log("[check-prompt] blocked prompt, reason:", result.reason);
+  }
+
   return json(
     result.safe
       ? { safe: true }
-      : { safe: false, reason: result.reason },
+      : { safe: false },
     200
   );
 }

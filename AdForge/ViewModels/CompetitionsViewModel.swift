@@ -13,6 +13,7 @@ final class CompetitionsViewModel {
     var entries: [CompetitionEntry] = []
     var leaderboard: [CompetitionEntry] = []
     var isLoading: Bool = false
+    private var votedEntryIds: Set<String> = []
 
     // MARK: - Private
 
@@ -86,9 +87,17 @@ final class CompetitionsViewModel {
             if let idx = leaderboard.firstIndex(where: { $0.id == entry.id }) {
                 leaderboard[idx].voteCount += 1
             }
+            // Decrement hearts
+            appState.currentUser?.heartsRemaining -= 1
+            // Track voted entry
+            votedEntryIds.insert(entry.id)
         } catch {
             appState.errorMessage = error.localizedDescription
         }
+    }
+
+    func hasVotedForEntry(_ entryId: String) -> Bool {
+        votedEntryIds.contains(entryId)
     }
 
     var dailyChallengesSub: Sub? {

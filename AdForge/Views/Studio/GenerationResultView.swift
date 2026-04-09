@@ -3,6 +3,7 @@
 
 import SwiftUI
 import AVKit
+import Photos
 
 struct GenerationResultView: View {
     let generation: Generation
@@ -14,6 +15,7 @@ struct GenerationResultView: View {
     @State private var showingSubmitSheet = false
     @State private var saveSuccess = false
     @State private var saveError: String? = nil
+    @State private var shareItems: [Any] = []
 
     var body: some View {
         NavigationStack {
@@ -78,7 +80,7 @@ struct GenerationResultView: View {
                                     icon: "square.and.arrow.up.fill",
                                     label: "Share",
                                     color: Design.accentLight,
-                                    action: { showingShareSheet = true }
+                                    action: prepareAndShare
                                 )
 
                                 ActionButton(
@@ -146,9 +148,7 @@ struct GenerationResultView: View {
             }
         }
         .sheet(isPresented: $showingShareSheet) {
-            ShareSheet(
-                items: [generation.mediaURL, "Check out what I made with AdForge! adforge://generation/\(generation.id)"]
-            )
+            ShareSheet(items: shareItems)
         }
         .sheet(isPresented: $showingSubmitSheet) {
             SubmitToSubSheet(
@@ -167,6 +167,13 @@ struct GenerationResultView: View {
                     if let image = UIImage(data: data) {
                         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
                     }
+                } else {
+                    // Download video to a temp file then save to Photos
+                    let (tempLocalURL, _) = try await URLSession.shared.download(from: url)
+                    let tempDir = FileManager.default.temporaryDirectory
+                    let destURL = tempDir.appendingPathComponent(UUID().uuidString + ".mp4")
+                    try FileManager.default.moveItem(at: tempLocalURL, to: destURL)
+                    UISaveVideoAtPathToSavedPhotosAlbum(destURL.path, nil, nil, nil)
                 }
                 withAnimation { saveSuccess = true }
                 try? await Task.sleep(for: .seconds(2))
@@ -174,6 +181,34 @@ struct GenerationResultView: View {
             } catch {
                 saveError = "Could not save to Photos."
             }
+        }
+    }
+
+    private func prepareAndShare() {
+        Task {
+            guard let url = URL(string: generation.mediaURL) else {
+                let caption = "Check out what I made with AdForge! adforge://generation/\(generation.id)"
+                shareItems = [generation.mediaURL, caption]
+                showingShareSheet = true
+                return
+            }
+            let caption = "Check out what I made with AdForge! adforge://generation/\(generation.id)"
+            if generation.type == .image {
+                do {
+                    let (data, _) = try await URLSession.shared.data(from: url)
+                    if let image = UIImage(data: data) {
+                        let watermarked = await WatermarkRenderer.applyWatermark(to: image)
+                        shareItems = [watermarked, caption]
+                    } else {
+                        shareItems = [url, caption]
+                    }
+                } catch {
+                    shareItems = [url, caption]
+                }
+            } else {
+                shareItems = [url, caption]
+            }
+            showingShareSheet = true
         }
     }
 }
@@ -223,13 +258,13 @@ private struct MediaDisplayView: View {
 
 private struct VideoPlayerView: View {
     let videoURL: URL?
+    @State private var player: AVPlayer?
 
     var body: some View {
         ZStack {
-            if let url = videoURL {
-                let player = AVPlayer(url: url)
+            if let player = player {
                 VideoPlayer(player: player)
-            } else {
+            } else if videoURL == nil {
                 ZStack {
                     RoundedRectangle(cornerRadius: Design.cornerRadius)
                         .fill(Design.surfaceLight)
@@ -237,6 +272,11 @@ private struct VideoPlayerView: View {
                         .font(.system(size: 40))
                         .foregroundStyle(Design.textSecondary)
                 }
+            }
+        }
+        .onAppear {
+            if let url = videoURL {
+                player = AVPlayer(url: url)
             }
         }
     }

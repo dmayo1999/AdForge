@@ -4,7 +4,7 @@
  * Handles model routing, API calls, and error normalisation.
  */
 
-import * as fal from "@fal-ai/client";
+import { fal } from "@fal-ai/client";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -40,7 +40,7 @@ const IMAGE_MODEL_ENDPOINTS: Record<string, string> = {
 };
 
 const VIDEO_MODEL_ENDPOINTS: Record<string, string> = {
-  "wan-2.5": "fal-ai/wan/v2.5",
+  "wan-2.5": "fal-ai/wan-25-preview/text-to-video",
 };
 
 // ---------------------------------------------------------------------------
@@ -101,8 +101,8 @@ export async function generateImage(
       input: {
         prompt,
         num_images: 1,
-        image_size: "landscape_4_3",
-        output_format: "jpeg",
+        image_size: "square_hd",
+        output_format: "png",
         safety_tolerance: "2", // conservative: 1–5, lower = stricter
       },
       logs: false,
@@ -154,13 +154,10 @@ export async function generateVideo(
     result = (await fal.subscribe(endpoint, {
       input: {
         prompt,
-        num_frames: 81,       // ~5 seconds @ ~16fps for Wan 2.5
-        resolution: "480p",
+        resolution: "720p",
         aspect_ratio: "16:9",
       },
       logs: false,
-      // Video generation can take 30–120 seconds — poll aggressively
-      pollInterval: 3000,
     })) as { data: FalVideoOutput };
   } catch (err) {
     throw normalizeFalError("generateVideo", model, err);

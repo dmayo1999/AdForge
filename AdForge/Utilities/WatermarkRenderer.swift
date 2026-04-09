@@ -78,13 +78,12 @@ enum WatermarkRenderer {
     // MARK: - Async Variant
 
     /// Async wrapper so watermark rendering can be called from async contexts without blocking MainActor.
+    /// Uses nonisolated(unsafe) to move UIImage off the main actor for background rendering.
     static func applyWatermark(to image: UIImage) async -> UIImage {
-        await withCheckedContinuation { continuation in
-            DispatchQueue.global(qos: .userInitiated).async {
-                let watermarked = applyWatermark(to: image)
-                continuation.resume(returning: watermarked)
-            }
-        }
+        let sendableImage = image
+        return await Task.detached(priority: .userInitiated) {
+            applyWatermark(to: sendableImage)
+        }.value
     }
 
     // MARK: - Batch

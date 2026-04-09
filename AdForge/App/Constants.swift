@@ -122,7 +122,7 @@ enum DefaultSubs {
             iconName: "play.rectangle.fill",
             acceptedTypes: [.video],
             isActive: true,
-            votingWindowHours: 24
+            votingWindowHours: 48
         ),
         Sub(
             id: "sub-funny-ai-fails",

@@ -118,7 +118,7 @@ final class AuthService {
             let lastDay = calendar.startOfDay(for: lastActive)
             if lastDay < today {
                 // New day — reset daily counters
-                user.dailyFreeCreditsCollected = false
+                // Note: dailyFreeCreditsCollected is managed exclusively by CreditService
                 user.adWatchesToday = 0
 
                 // Check streak

@@ -70,7 +70,7 @@ final class GenerationService {
 
     /// Generates an image using the specified model and prompt.
     /// Returns a `Generation` with the resulting media URL.
-    func generateImage(prompt: String, model: AIModel, userId: String = "local") async throws -> Generation {
+    func generateImage(prompt: String, model: AIModel, userId: String = "local", userDisplayName: String = "Creator") async throws -> Generation {
         guard model.type == .image else {
             throw GenerationError.modelUnavailable
         }
@@ -81,7 +81,7 @@ final class GenerationService {
         }
 
         if isMockMode {
-            return try await mockGenerateImage(prompt: prompt, model: model, userId: userId)
+            return try await mockGenerateImage(prompt: prompt, model: model, userId: userId, userDisplayName: userDisplayName)
         }
 
         // Real backend call
@@ -94,6 +94,7 @@ final class GenerationService {
         let generation = Generation(
             id: UUID().uuidString,
             userId: userId,
+            userDisplayName: userDisplayName,
             prompt: prompt,
             model: model,
             type: .image,
@@ -112,7 +113,7 @@ final class GenerationService {
     // MARK: - Generate Video
 
     /// Generates a video using the Wan 2.5 model.
-    func generateVideo(prompt: String, model: AIModel, userId: String = "local") async throws -> Generation {
+    func generateVideo(prompt: String, model: AIModel, userId: String = "local", userDisplayName: String = "Creator") async throws -> Generation {
         guard model.type == .video else {
             throw GenerationError.modelUnavailable
         }
@@ -122,7 +123,7 @@ final class GenerationService {
         }
 
         if isMockMode {
-            return try await mockGenerateVideo(prompt: prompt, model: model, userId: userId)
+            return try await mockGenerateVideo(prompt: prompt, model: model, userId: userId, userDisplayName: userDisplayName)
         }
 
         let request = GenerateVideoRequest(prompt: prompt, model: model.rawValue, userId: userId)
@@ -134,6 +135,7 @@ final class GenerationService {
         let generation = Generation(
             id: UUID().uuidString,
             userId: userId,
+            userDisplayName: userDisplayName,
             prompt: prompt,
             model: model,
             type: .video,
@@ -176,7 +178,7 @@ final class GenerationService {
     // MARK: - Mock Implementations
 
     /// Simulates image generation with a realistic delay and a placeholder image.
-    private func mockGenerateImage(prompt: String, model: AIModel, userId: String) async throws -> Generation {
+    private func mockGenerateImage(prompt: String, model: AIModel, userId: String, userDisplayName: String) async throws -> Generation {
         // Simulate generation time: FLUX Dev ~8s, FLUX Pro ~15s
         let delay: UInt64 = model == .fluxPro ? 4_000_000_000 : 2_500_000_000
         try await Task.sleep(nanoseconds: delay)
@@ -195,6 +197,7 @@ final class GenerationService {
         let generation = Generation(
             id: UUID().uuidString,
             userId: userId,
+            userDisplayName: userDisplayName,
             prompt: prompt,
             model: model,
             type: .image,
@@ -211,13 +214,14 @@ final class GenerationService {
     }
 
     /// Simulates video generation with a longer delay and a placeholder video.
-    private func mockGenerateVideo(prompt: String, model: AIModel, userId: String) async throws -> Generation {
+    private func mockGenerateVideo(prompt: String, model: AIModel, userId: String, userDisplayName: String) async throws -> Generation {
         // Wan 2.5 takes ~45s in real life; simulate 5s for MVP
         try await Task.sleep(nanoseconds: 5_000_000_000)
 
         let generation = Generation(
             id: UUID().uuidString,
             userId: userId,
+            userDisplayName: userDisplayName,
             prompt: prompt,
             model: model,
             type: .video,
