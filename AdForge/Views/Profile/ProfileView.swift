@@ -208,8 +208,9 @@ private struct XPBar: View {
     let level: Int
 
     private var progress: Double {
-        let xpPerLevel = 1000
-        return min(1.0, Double(xp % xpPerLevel) / Double(xpPerLevel))
+        // Use the same formula as AFUser.levelProgress: 500 * level per level
+        let xpForNextLevel = 500 * max(level, 1)
+        return min(1.0, Double(xp % xpForNextLevel) / Double(xpForNextLevel))
     }
 
     var body: some View {

@@ -175,7 +175,7 @@ struct SubmitToSubSheet: View {
         guard generationId == nil else { return }
         isLoadingGenerations = true
         do {
-            let all = try await appState.feedService.fetchFeed(page: 0)
+            let all = try await appState.feedService.fetchFeed(page: 1)
             recentGenerations = all.filter { $0.userId == appState.currentUser?.id }
         } catch {
             appState.errorMessage = error.localizedDescription

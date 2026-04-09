@@ -33,7 +33,7 @@ final class FeedViewModel {
         hasMore = true
 
         do {
-            let results = try await appState.feedService.fetchFeed(page: 0)
+            let results = try await appState.feedService.fetchFeed(page: 1)
             generations = results
             hasMore = !results.isEmpty
         } catch {

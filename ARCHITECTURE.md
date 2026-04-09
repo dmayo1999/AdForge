@@ -111,6 +111,7 @@ enum AIModel: String, Codable, CaseIterable, Identifiable, Sendable {
 struct Generation: Codable, Identifiable, Sendable {
     let id: String
     let userId: String
+    let userDisplayName: String       // Creator name shown in feed
     let prompt: String
     let model: AIModel
     let type: GenerationType
@@ -253,8 +254,8 @@ enum AppTab: Int, CaseIterable {
 
 ### GenerationService
 ```
-- generateImage(prompt: String, model: AIModel) async throws -> Generation
-- generateVideo(prompt: String, model: AIModel) async throws -> Generation
+- generateImage(prompt: String, model: AIModel, userId: String, userDisplayName: String) async throws -> Generation
+- generateVideo(prompt: String, model: AIModel, userId: String, userDisplayName: String) async throws -> Generation
 - checkPrompt(prompt: String) async throws -> Bool   // true = safe
 ```
 
@@ -295,9 +296,12 @@ enum AppTab: Int, CaseIterable {
 - isGenerating: Bool
 - generationProgress: String?         // Status text during generation
 - lastGeneration: Generation?
+- showingResult: Bool
 - availableModels: [AIModel]         // filtered by selectedType
 - creditCost: Int                    // computed from selectedModel
-- canGenerate: Bool                  // has enough credits
+- canGenerate: Bool                  // has enough credits + prompt not empty
+- canGenerateWithAd: Bool            // prompt not empty + ad ready + under daily limit
+- adsRemainingToday: Int
 - generate() async
 - watchAdAndGenerate() async
 ```
@@ -318,11 +322,15 @@ enum AppTab: Int, CaseIterable {
 - subs: [Sub]
 - selectedSub: Sub?
 - entries: [CompetitionEntry]
+- leaderboard: [CompetitionEntry]
 - isLoading: Bool
+- dailyChallengesSub: Sub?           // computed: first sub with 24h window
 - loadSubs() async
 - loadEntries(for sub: Sub) async
+- loadLeaderboard(for sub: Sub) async
 - submitEntry(generationId: String, to sub: Sub) async
 - vote(for entry: CompetitionEntry) async
+- hasVotedForEntry(_ entryId: String) -> Bool
 ```
 
 ### ProfileViewModel
@@ -435,37 +443,42 @@ JSON array of blocked terms/phrases. Generic refusal, no explanation.
 16. AdForge/Utilities/Extensions.swift
 17. AdForge/Utilities/PromptFilter.swift
 18. AdForge/Utilities/WatermarkRenderer.swift
+19. AdForge/Utilities/ModelExtensions.swift   (Sub: Hashable conformance)
+20. AdForge/Utilities/PreviewHelpers.swift    (AppState.preview, mock data for #Preview)
 
 ### iOS UI (Views + ViewModels)
-19. AdForge/ViewModels/StudioViewModel.swift
-20. AdForge/ViewModels/FeedViewModel.swift
-21. AdForge/ViewModels/CompetitionsViewModel.swift
-22. AdForge/ViewModels/ProfileViewModel.swift
-23. AdForge/Views/Auth/AuthView.swift
-24. AdForge/AdForgeApp.swift (includes MainTabView)
-25. AdForge/Views/Studio/StudioView.swift
-26. AdForge/Views/Studio/ModelPickerView.swift
-27. AdForge/Views/Studio/PromptInputView.swift
-28. AdForge/Views/Studio/GenerationResultView.swift
-29. AdForge/Views/Feed/FeedView.swift
-30. AdForge/Views/Feed/FeedCardView.swift
-31. AdForge/Views/Competitions/CompetitionsView.swift
-32. AdForge/Views/Competitions/SubDetailView.swift
-33. AdForge/Views/Competitions/LeaderboardView.swift
-34. AdForge/Views/Competitions/SubmitToSubSheet.swift
-35. AdForge/Views/Profile/ProfileView.swift
-36. AdForge/Views/Components/CreditBalanceView.swift
-37. AdForge/Views/Components/WatchAdButton.swift
-38. AdForge/Views/Components/ReportSheet.swift
-39. AdForge/Views/Components/ShareSheet.swift
-40. AdForge/Views/Components/VoteButton.swift
+21. AdForge/ViewModels/StudioViewModel.swift
+22. AdForge/ViewModels/FeedViewModel.swift
+23. AdForge/ViewModels/CompetitionsViewModel.swift
+24. AdForge/ViewModels/ProfileViewModel.swift
+25. AdForge/Views/Auth/AuthView.swift
+26. AdForge/AdForgeApp.swift (includes MainTabView + CustomTabBar + DailyCreditsToast)
+27. AdForge/Views/Studio/StudioView.swift
+28. AdForge/Views/Studio/ModelPickerView.swift
+29. AdForge/Views/Studio/PromptInputView.swift
+30. AdForge/Views/Studio/GenerationResultView.swift
+31. AdForge/Views/Feed/FeedView.swift
+32. AdForge/Views/Feed/FeedCardView.swift
+33. AdForge/Views/Competitions/CompetitionsView.swift
+34. AdForge/Views/Competitions/SubDetailView.swift
+35. AdForge/Views/Competitions/LeaderboardView.swift
+36. AdForge/Views/Competitions/SubmitToSubSheet.swift
+37. AdForge/Views/Profile/ProfileView.swift
+38. AdForge/Views/Components/CreditBalanceView.swift
+39. AdForge/Views/Components/WatchAdButton.swift
+40. AdForge/Views/Components/ReportSheet.swift
+41. AdForge/Views/Components/ShareSheet.swift
+42. AdForge/Views/Components/VoteButton.swift
 
 ### Backend
-41. backend/api/generate-image.ts
-42. backend/api/generate-video.ts
-43. backend/api/check-prompt.ts
-44. backend/lib/blocklist.json
-45. backend/lib/fal-client.ts
-46. backend/package.json
-47. backend/tsconfig.json
-48. backend/vercel.json
+43. backend/api/generate-image.ts
+44. backend/api/generate-video.ts
+45. backend/api/check-prompt.ts
+46. backend/api/health.ts
+47. backend/lib/blocklist.json
+48. backend/lib/fal-client.ts
+49. backend/lib/prompt-checker.ts
+50. backend/package.json
+51. backend/tsconfig.json
+52. backend/vercel.json
+53. backend/.env.example

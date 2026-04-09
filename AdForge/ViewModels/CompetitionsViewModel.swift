@@ -79,7 +79,7 @@ final class CompetitionsViewModel {
             return
         }
         do {
-            try await appState.feedService.voteForGeneration(id: entry.generationId)
+            try await appState.competitionService.voteForEntry(entryId: entry.id, subId: entry.subId)
             // Optimistic update
             if let idx = entries.firstIndex(where: { $0.id == entry.id }) {
                 entries[idx].voteCount += 1

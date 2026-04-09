@@ -128,7 +128,11 @@ struct AuthView: View {
     private func signIn() async {
         isSigningIn = true
         do {
-            _ = try await appState.authService.signInWithApple()
+            let user = try await appState.authService.signInWithApple()
+            appState.currentUser = user
+            appState.isAuthenticated = true
+            // Collect daily credits on first sign-in
+            _ = await appState.collectDailyCredits()
         } catch {
             appState.errorMessage = error.localizedDescription
         }

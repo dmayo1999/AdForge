@@ -18,6 +18,10 @@ struct AdForgeApp: App {
             }
             .preferredColorScheme(.dark)
             .environment(appState)
+            .task {
+                // Restore session on app launch
+                await appState.checkSession()
+            }
         }
     }
 }

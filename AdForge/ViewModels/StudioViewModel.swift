@@ -131,10 +131,7 @@ final class StudioViewModel {
 
             if completed {
                 generationProgress = "Crediting account..."
-                await appState.creditService.earnCredits(
-                    amount: CreditCost.perAdWatch,
-                    reason: .adWatch
-                )
+                // recordAdWatch() handles both the counter increment AND earnCredits internally
                 await appState.creditService.recordAdWatch()
                 isGenerating = false
                 generationProgress = nil

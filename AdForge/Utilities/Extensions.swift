@@ -4,6 +4,7 @@
 // Reusable Swift / SwiftUI extensions used across the codebase.
 
 import SwiftUI
+import UIKit
 import Foundation
 
 // MARK: - Color + Hex

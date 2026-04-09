@@ -37,7 +37,7 @@ final class ProfileViewModel {
         isLoading = true
         do {
             // FeedService scoped to the current user
-            let allGenerations = try await appState.feedService.fetchFeed(page: 0)
+            let allGenerations = try await appState.feedService.fetchFeed(page: 1)
             userGenerations = allGenerations.filter { $0.userId == appState.currentUser?.id }
         } catch {
             appState.errorMessage = error.localizedDescription
