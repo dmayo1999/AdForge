@@ -13,8 +13,8 @@
  *
  * Edge function — runs at the CDN edge worldwide.
  *
- * Rate limiting: max 50 requests per IP per hour (in-memory).
- * TODO: Replace with Redis (Upstash) for multi-instance production use.
+ * Rate limiting: max 50 requests per IP per hour per route. Upstash Redis when
+ * configured; otherwise in-memory. See generate-image.ts.
  *
  * Note: Video generation typically takes 30–120 seconds. The Edge Function
  * runtime has a maximum execution time of 30s by default. Vercel Pro/Enterprise
@@ -24,59 +24,13 @@
 
 import { checkPrompt } from "../lib/prompt-checker.js";
 import { generateVideo } from "../lib/fal-client.js";
+import { checkRateLimit } from "../lib/rate-limit.js";
 
 export const config = {
   runtime: "edge",
   // Increase max duration if your Vercel plan supports it
   maxDuration: 300,
 };
-
-// ---------------------------------------------------------------------------
-// Rate limiting — simple in-memory sliding window
-// NOT suitable for multi-instance deployments without Redis.
-// ---------------------------------------------------------------------------
-
-interface RateLimitEntry {
-  timestamps: number[];
-}
-
-const rateLimitMap = new Map<string, RateLimitEntry>();
-
-const RATE_LIMIT_MAX = 50;
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
-
-function checkRateLimit(ip: string): { allowed: boolean; retryAfter?: number } {
-  const rateLimitEnabled = process.env["RATE_LIMIT_ENABLED"] !== "false";
-  if (!rateLimitEnabled) return { allowed: true };
-
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip) ?? { timestamps: [] };
-
-  entry.timestamps = entry.timestamps.filter(
-    (t) => now - t < RATE_LIMIT_WINDOW_MS
-  );
-
-  if (entry.timestamps.length >= RATE_LIMIT_MAX) {
-    const oldest = entry.timestamps[0];
-    const retryAfter = Math.ceil(
-      (oldest + RATE_LIMIT_WINDOW_MS - now) / 1000
-    );
-    return { allowed: false, retryAfter };
-  }
-
-  entry.timestamps.push(now);
-  rateLimitMap.set(ip, entry);
-
-  if (rateLimitMap.size > 10_000) {
-    for (const [key, val] of rateLimitMap) {
-      if (val.timestamps.every((t) => now - t >= RATE_LIMIT_WINDOW_MS)) {
-        rateLimitMap.delete(key);
-      }
-    }
-  }
-
-  return { allowed: true };
-}
 
 // ---------------------------------------------------------------------------
 // CORS headers
@@ -109,17 +63,20 @@ export default async function handler(req: Request): Promise<Response> {
     req.headers.get("x-real-ip") ??
     "unknown";
 
-  const rl = checkRateLimit(ip);
-  if (!rl.allowed) {
+  const rl = await checkRateLimit("video", ip);
+  if (rl.type === "limited") {
     return json(
       {
         error: "rate_limit_exceeded",
-        message: `Too many requests. Retry after ${rl.retryAfter} seconds.`,
-        retryAfter: rl.retryAfter,
+        message: `Too many requests. Retry after ${rl.retryAfterSeconds} seconds.`,
+        retryAfter: rl.retryAfterSeconds,
       },
       429,
-      { "Retry-After": String(rl.retryAfter) }
+      { "Retry-After": String(rl.retryAfterSeconds) }
     );
+  }
+  if (rl.type === "redis_unavailable") {
+    return json({ error: "rate_limit_unavailable" }, 503);
   }
 
   // Parse body
