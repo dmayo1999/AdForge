@@ -20,6 +20,12 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": false
   },
-  "include": ["api/**/*", "lib/**/*"],
+  "include": [
+    "api/**/*",
+    "lib/**/*",
+    "vitest.config.ts",
+    "lib/**/*.test.ts",
+    "api/**/*.test.ts"
+  ],
   "exclude": ["node_modules", ".vercel"]
 }
