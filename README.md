@@ -188,11 +188,17 @@ AdForge/
 
 ### Backend Setup
 
-1. **Install dependencies:**
-   ```bash
-   cd backend
-   npm install
-   ```
+1. **Install dependencies** (pick one):
+   - **Docker (recommended):** keeps `node_modules` off your machine; from the repo root:
+     ```bash
+     ./scripts/backend-docker.sh "npm install"
+     ```
+     After the first install you have a `package-lock.json`; day-to-day checks:
+     ```bash
+     ./scripts/backend-docker.sh
+     ```
+     (defaults to `npm ci`, TypeScript `typecheck`, and Vitest — same as CI.)
+   - **Local Node:** `cd backend && npm install` if you already use Node on your system.
 
 2. **Configure environment:**
    ```bash
@@ -211,6 +217,8 @@ AdForge/
    ```
 
 5. **Update iOS app:** Set `API.baseURL` in `Constants.swift` to your deployed URL.
+
+**CI / quality:** Pushes to `main` run **Backend CI** (GitHub Actions): `npm ci`, TypeScript `typecheck`, and Vitest in `backend/`. You can match that locally with `./scripts/backend-docker.sh` without installing Node on your Mac.
 
 ---
 
@@ -251,6 +259,8 @@ AdForge/
 |----------|-------------|
 | `FAL_KEY` | Fal.ai API key |
 | `RATE_LIMIT_ENABLED` | Enable rate limiting (true/false) |
+| `UPSTASH_REDIS_REST_URL` | Optional. Upstash Redis REST URL for distributed per-IP rate limits |
+| `UPSTASH_REDIS_REST_TOKEN` | Optional. Upstash token (both URL and token required to use Redis) |
 
 ### iOS (Constants.swift)
 
