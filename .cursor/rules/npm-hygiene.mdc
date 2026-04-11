@@ -1,0 +1,41 @@
+---
+description: How npm/Node is used in this project — Docker-first, no local npm install on host
+globs: backend/**/*,scripts/**/*,**/package.json,**/package-lock.json,**/*.yml
+alwaysApply: false
+---
+
+# npm Hygiene
+
+## Policy
+
+**Never run `npm install` or `npm ci` directly on the host machine.** All npm/Node commands for `backend/` run inside Docker via `scripts/backend-docker.sh`. This keeps `node_modules` off the host filesystem and Node out of the global environment.
+
+CI (GitHub Actions) is the source of truth for passing tests — pushing triggers `npm ci && typecheck && vitest` automatically.
+
+## How to run backend commands
+
+```bash
+# First-time / after package.json changes — generates package-lock.json
+./scripts/backend-docker.sh "npm install"
+
+# Default (same as CI): npm ci + typecheck + test
+./scripts/backend-docker.sh
+
+# Custom command
+./scripts/backend-docker.sh "npm test"
+```
+
+## When package.json changes
+
+Always run `./scripts/backend-docker.sh "npm install"` after editing `package.json`, then **commit the updated `package-lock.json`**. CI uses `npm ci` which requires a committed lockfile.
+
+## What NOT to do
+
+- ❌ `npm install` in the terminal on the host
+- ❌ `npm install -g` for any backend tooling
+- ❌ Committing `backend/node_modules/` (it is gitignored)
+- ❌ Running `npm install` as part of an agent task without flagging it first
+
+## Secrets rule (related)
+
+`FAL_KEY`, `UPSTASH_REDIS_REST_URL`, and `UPSTASH_REDIS_REST_TOKEN` live **only in Vercel server-side env vars**. Never in client-side code, never committed.
